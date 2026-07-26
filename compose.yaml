@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ../springbootProjects/community-api
+      dockerfile: Dockerfile
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
