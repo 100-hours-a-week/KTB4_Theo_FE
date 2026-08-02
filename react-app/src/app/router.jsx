@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import ProtectedRoute from '../components/routing/ProtectedRoute.jsx'
 import LoginPage from '../features/auth/LoginPage.jsx'
+import NotificationListPage from '../features/notifications/NotificationListPage.jsx'
 import SignupPage from '../features/auth/SignupPage.jsx'
 import PasswordEditPage from '../features/password/edit/PasswordEditPage.jsx'
 import PostListPage from '../features/posts/PostListPage.jsx'
@@ -19,6 +20,7 @@ function AppRouter() {
         <Route path="/posts/new" element={<PostCreatePage />} />
         <Route path="/posts/:postId/edit" element={<PostEditPage />} />
         <Route path="/posts/:postId" element={<PostDetailPage />} />
+        <Route path="/notifications" element={<NotificationListPage />} />
         <Route path="/profile/edit" element={<ProfileEditPage />} />
         <Route path="/password/edit" element={<PasswordEditPage />} />
       </Route>
