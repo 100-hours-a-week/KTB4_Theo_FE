@@ -554,6 +554,19 @@ function PostDetailPage() {
       : null
   const isCommentSubmitting = isCommentCreating || isCommentUpdating
 
+  useEffect(() => {
+    if (!post || !window.location.hash.startsWith('#comment-')) {
+      return
+    }
+
+    const target = document.getElementById(window.location.hash.slice(1))
+
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      target.focus?.({ preventScroll: true })
+    }
+  }, [post])
+
   return (
     <AppLayout
       pageClassName="post-page"

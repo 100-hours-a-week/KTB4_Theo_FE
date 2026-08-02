@@ -11,7 +11,11 @@ function CommentCard({ comment, replyTarget, editingReply, isReplySubmitting, on
     comment.author && !comment.commentDeleted && !comment.authorDeleted
 
   return (
-    <article className="comment-card">
+    <article
+      className="comment-card"
+      id={`comment-${comment.commentId}`}
+      tabIndex="-1"
+    >
       <div className="comment-card-header">
         <div className="comment-author-information">
           <div className="comment-profile">
