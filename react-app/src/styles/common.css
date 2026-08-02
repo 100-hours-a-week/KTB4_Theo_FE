@@ -273,7 +273,97 @@ body {
   top: 50%;
   left: calc(50% + 245px);
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   transform: translateY(-50%);
+}
+
+.notification-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid rgba(148, 170, 178, 0.24);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--color-auth-text);
+  text-decoration: none;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+}
+
+.notification-button:hover {
+  border-color: rgba(88, 244, 207, 0.55);
+  background-color: rgba(88, 244, 207, 0.12);
+  transform: translateY(-1px);
+}
+
+.notification-button:focus-visible {
+  outline: 2px solid var(--color-auth-mint);
+  outline-offset: 3px;
+}
+
+.notification-bell {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 20px;
+}
+
+.notification-bell-body {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 0;
+}
+
+.notification-bell-body::after {
+  content: "";
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  left: -4px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.notification-bell-clapper {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 5px;
+  height: 3px;
+  border-radius: 0 0 5px 5px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border: 2px solid #0c1218;
+  border-radius: 10px;
+  background: #ff6178;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .profile-button {

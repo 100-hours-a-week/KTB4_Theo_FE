@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router'
 import ProfileImage from '../media/ProfileImage.jsx'
+import NotificationButton from './NotificationButton.jsx'
 import ProfileMenu from './ProfileMenu.jsx'
 
 function Header({
@@ -52,6 +53,8 @@ function Header({
         className="profile-menu-container"
         ref={profileMenuContainerRef}
       >
+        <NotificationButton />
+
         <button
           type="button"
           className="profile-button"
