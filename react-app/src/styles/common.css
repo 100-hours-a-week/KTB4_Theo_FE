@@ -647,3 +647,17 @@ img.default-profile-image {
     left: auto;
   }
 }
+.post-image-policy-guide,
+.profile-image-policy-guide {
+  color: var(--color-auth-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.post-image-policy-guide {
+  margin: -4px 0 12px;
+}
+
+.profile-image-policy-guide {
+  margin: 6px 0 12px;
+}

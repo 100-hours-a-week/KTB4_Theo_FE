@@ -4,6 +4,7 @@ import { createPost } from '../../../api/postApi.js'
 import backButton from '../../../assets/images/back-button.png'
 import AppLayout from '../../../components/layout/AppLayout.jsx'
 import useHeaderControls from '../../../hooks/useHeaderControls.js'
+import { getImageRequestError } from '../../../utils/imageFiles.js'
 import '../../../styles/common.css'
 import '../../../styles/post-create.css'
 import useAuth from '../../auth/useAuth.js'
@@ -12,6 +13,7 @@ import PostForm from '../editor/components/PostForm.jsx'
 const EMPTY_SERVER_ERRORS = {
   title: '',
   content: '',
+  images: '',
 }
 
 function PostCreatePage() {
@@ -72,6 +74,15 @@ function PostCreatePage() {
         return
       }
 
+      const imageError = getImageRequestError(error)
+      if (imageError) {
+        setServerErrors({
+          ...EMPTY_SERVER_ERRORS,
+          images: imageError,
+        })
+        return
+      }
+
       if (status === 401 && message === 'unauthorized_request') {
         alert('로그인이 필요합니다.')
         navigate('/login', { replace: true })
@@ -105,15 +116,17 @@ function PostCreatePage() {
       const requestPromise = createPost({
         title: title.trim(),
         content: content.trim(),
-        imageUrls: imageFiles.map((file) => file.name),
+        images: imageFiles,
       })
         .then((data) => {
           if (!isMountedRef.current) {
             return
           }
 
-          if (data?.postId) {
-            navigate(`/posts/${data.postId}`)
+          const createdPostId = data?.postId ?? data
+
+          if (createdPostId) {
+            navigate(`/posts/${createdPostId}`)
             return
           }
 
@@ -154,7 +167,7 @@ function PostCreatePage() {
       mainClassName="make-post-main"
       headerProps={{
         logoClassName: 'make-post-logo',
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,

@@ -11,6 +11,7 @@ import ExistingImageList from './ExistingImageList.jsx'
 const EMPTY_ERRORS = {
   title: '',
   content: '',
+  images: '',
 }
 
 function PostEditForm({
@@ -22,6 +23,7 @@ function PostEditForm({
 }) {
   const [title, setTitle] = useState(initialValues.title)
   const [content, setContent] = useState(initialValues.content)
+  const [retainedImages, setRetainedImages] = useState(initialValues.images)
   const [imageFiles, setImageFiles] = useState([])
   const [fieldErrors, setFieldErrors] = useState(EMPTY_ERRORS)
   const canSubmit = isPostFormValid({ title, content }) && !isSubmitting
@@ -60,7 +62,18 @@ function PostEditForm({
       return
     }
 
-    onSubmit({ title, content, imageFiles })
+    onSubmit({
+      title,
+      content,
+      retainedImageIds: retainedImages.map((image) => image.imageId),
+      imageFiles,
+    })
+  }
+
+  function handleRemoveExistingImage(imageId) {
+    setRetainedImages((currentImages) =>
+      currentImages.filter((image) => image.imageId !== imageId),
+    )
   }
 
   const titleError = fieldErrors.title || serverErrors.title || ''
@@ -104,15 +117,25 @@ function PostEditForm({
         </p>
       </div>
 
-      <ExistingImageList imagePaths={initialValues.imageUrls} />
-      <EditPostImagePicker files={imageFiles} onChange={setImageFiles} />
+      <ExistingImageList
+        images={retainedImages}
+        disabled={isSubmitting}
+        onRemove={handleRemoveExistingImage}
+      />
+      <EditPostImagePicker
+        files={imageFiles}
+        disabled={isSubmitting}
+        serverError={serverErrors.images}
+        onChange={setImageFiles}
+        onClearServerError={() => onClearServerError('images')}
+      />
 
       <button
         type="submit"
         className="edit-post-submit-button"
         disabled={!canSubmit}
       >
-        수정하기
+        {isSubmitting ? '수정 중...' : '수정하기'}
       </button>
     </form>
   )

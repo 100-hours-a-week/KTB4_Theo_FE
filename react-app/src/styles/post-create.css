@@ -265,6 +265,25 @@
   object-fit: cover;
 }
 
+.post-image-preview-item {
+  display: grid;
+  gap: 8px;
+}
+
+.post-image-remove-button {
+  padding: 8px;
+  border: 1px solid rgba(255, 127, 145, 0.45);
+  border-radius: 6px;
+  background: rgba(255, 127, 145, 0.08);
+  color: #ff9aaa;
+  cursor: pointer;
+}
+
+.post-image-remove-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .make-post-actions {
   position: fixed;
   right: 0;

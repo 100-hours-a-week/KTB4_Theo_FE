@@ -1,25 +1,25 @@
 import { useState } from 'react'
 import { resolveImageUrl } from '../../../../utils/image.js'
 
-function ExistingImageList({ imagePaths }) {
-  const [failedImageIndexes, setFailedImageIndexes] = useState(() => new Set())
-  const validImagePaths = Array.isArray(imagePaths)
-    ? imagePaths.filter(Boolean)
+function ExistingImageList({ images, onRemove, disabled = false }) {
+  const [failedImageIds, setFailedImageIds] = useState(() => new Set())
+  const validImages = Array.isArray(images)
+    ? images.filter((image) => image?.imageId && image?.imageUrl)
     : []
 
-  if (validImagePaths.length === 0) {
+  if (validImages.length === 0) {
     return null
   }
 
-  function handleImageError(index) {
-    setFailedImageIndexes((currentIndexes) => {
-      if (currentIndexes.has(index)) {
-        return currentIndexes
+  function handleImageError(imageId) {
+    setFailedImageIds((currentIds) => {
+      if (currentIds.has(imageId)) {
+        return currentIds
       }
 
-      const nextIndexes = new Set(currentIndexes)
-      nextIndexes.add(index)
-      return nextIndexes
+      const nextIds = new Set(currentIds)
+      nextIds.add(imageId)
+      return nextIds
     })
   }
 
@@ -27,15 +27,24 @@ function ExistingImageList({ imagePaths }) {
     <section className="existing-image-area">
       <h3>기존 이미지</h3>
       <div className="existing-image-list">
-        {validImagePaths.map((imagePath, index) =>
-          failedImageIndexes.has(index) ? null : (
-            <img
-              key={`${imagePath}-${index}`}
-              className="existing-post-image"
-              src={resolveImageUrl(imagePath)}
-              alt={`기존 게시글 이미지 ${index + 1}`}
-              onError={() => handleImageError(index)}
-            />
+        {validImages.map((image, index) =>
+          failedImageIds.has(image.imageId) ? null : (
+            <div key={image.imageId} className="existing-post-image-item">
+              <img
+                className="existing-post-image"
+                src={resolveImageUrl(image.imageUrl)}
+                alt={`기존 게시글 이미지 ${index + 1}`}
+                onError={() => handleImageError(image.imageId)}
+              />
+              <button
+                type="button"
+                className="existing-post-image-remove"
+                disabled={disabled}
+                onClick={() => onRemove(image.imageId)}
+              >
+                이미지 삭제
+              </button>
+            </div>
           ),
         )}
       </div>

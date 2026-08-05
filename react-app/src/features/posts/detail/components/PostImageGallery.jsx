@@ -3,8 +3,10 @@ import imageNextButton from '../../../../assets/images/image-next-button.png'
 import imageFallback from '../../../../assets/images/image_fallback.png'
 import { resolveImageUrl } from '../../../../utils/image.js'
 
-function PostImageGallery({ imagePaths }) {
-  const images = Array.isArray(imagePaths) ? imagePaths.filter(Boolean) : []
+function PostImageGallery({ images: imageResponses }) {
+  const images = Array.isArray(imageResponses)
+    ? imageResponses.filter((image) => image?.imageId && image?.imageUrl)
+    : []
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fallbackImagePaths, setFallbackImagePaths] = useState(
     () => new Set(),
@@ -16,7 +18,8 @@ function PostImageGallery({ imagePaths }) {
   }
 
   const imageCount = images.length
-  const currentImagePath = images[currentIndex]
+  const currentImage = images[currentIndex]
+  const currentImagePath = currentImage.imageUrl
   const shouldUseFallback = fallbackImagePaths.has(currentImagePath)
   const currentImageSrc = shouldUseFallback
     ? imageFallback
@@ -65,7 +68,7 @@ function PostImageGallery({ imagePaths }) {
       )}
 
       <img
-        key={currentImagePath}
+        key={currentImage.imageId}
         className="post-gallery-image"
         src={currentImageSrc}
         alt="게시글 첨부 이미지"

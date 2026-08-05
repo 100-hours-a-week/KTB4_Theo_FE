@@ -31,7 +31,7 @@ function PostDetailArticle({
       {!isBlinded && (
         <PostImageGallery
           key={renderVersion}
-          imagePaths={post.imageUrls}
+          images={post.images}
         />
       )}
 

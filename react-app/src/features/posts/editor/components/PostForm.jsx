@@ -10,6 +10,7 @@ import PostImagePicker from './PostImagePicker.jsx'
 const EMPTY_ERRORS = {
   title: '',
   content: '',
+  images: '',
 }
 
 function PostForm({
@@ -106,7 +107,13 @@ function PostForm({
         </p>
       </div>
 
-      <PostImagePicker files={imageFiles} onChange={setImageFiles} />
+      <PostImagePicker
+        files={imageFiles}
+        disabled={isSubmitting}
+        serverError={serverErrors.images}
+        onChange={setImageFiles}
+        onClearServerError={() => onClearServerError('images')}
+      />
 
       <div className="make-post-actions">
         <button
@@ -114,7 +121,7 @@ function PostForm({
           className="make-post-submit-button"
           disabled={!canSubmit}
         >
-          완료
+          {isSubmitting ? '등록 중...' : '완료'}
         </button>
       </div>
     </form>

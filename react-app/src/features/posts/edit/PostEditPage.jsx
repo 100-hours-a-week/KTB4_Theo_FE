@@ -4,6 +4,7 @@ import { getPost, updatePost } from '../../../api/postApi.js'
 import backButton from '../../../assets/images/back-button.png'
 import AppLayout from '../../../components/layout/AppLayout.jsx'
 import useHeaderControls from '../../../hooks/useHeaderControls.js'
+import { getImageRequestError } from '../../../utils/imageFiles.js'
 import '../../../styles/common.css'
 import '../../../styles/post-edit.css'
 import useAuth from '../../auth/useAuth.js'
@@ -12,6 +13,7 @@ import PostEditForm from './components/PostEditForm.jsx'
 const EMPTY_SERVER_ERRORS = {
   title: '',
   content: '',
+  images: '',
 }
 
 function parsePostId(postIdParam) {
@@ -28,8 +30,10 @@ function createEditablePost(post) {
   return {
     title: post?.title || '',
     content: post?.content || '',
-    imageUrls: Array.isArray(post?.imageUrls)
-      ? post.imageUrls.filter(Boolean)
+    images: Array.isArray(post?.images)
+      ? post.images.filter(
+          (image) => image?.imageId && image?.imageUrl,
+        )
       : [],
   }
 }
@@ -122,6 +126,18 @@ function PostEditPage() {
         return
       }
 
+      const imageError = getImageRequestError(error)
+      if (imageError) {
+        setServerErrorState({
+          postId: targetPostId,
+          errors: {
+            ...EMPTY_SERVER_ERRORS,
+            images: imageError,
+          },
+        })
+        return
+      }
+
       if (status === 401 && message === 'unauthorized_request') {
         alert('로그인이 필요합니다.')
         navigate('/login', { replace: true })
@@ -189,7 +205,7 @@ function PostEditPage() {
   }, [])
 
   const handleSubmit = useCallback(
-    ({ title, content, imageFiles }) => {
+    ({ title, content, retainedImageIds, imageFiles }) => {
       const currentPost =
         loadedPost?.postId === postId ? loadedPost.post : null
 
@@ -198,11 +214,6 @@ function PostEditPage() {
       }
 
       const targetPostId = postId
-      const imageUrls =
-        imageFiles.length > 0
-          ? imageFiles.map((file) => file.name)
-          : currentPost.imageUrls
-
       setServerErrorState({
         postId: targetPostId,
         errors: EMPTY_SERVER_ERRORS,
@@ -212,7 +223,8 @@ function PostEditPage() {
       const requestPromise = updatePost(targetPostId, {
         title: title.trim(),
         content: content.trim(),
-        imageUrls,
+        retainedImageIds,
+        newImages: imageFiles,
       })
         .then(() => {
           if (isMountedRef.current) {
@@ -287,7 +299,7 @@ function PostEditPage() {
       mainClassName="edit-post-main"
       headerProps={{
         logoClassName: 'edit-post-logo',
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,
