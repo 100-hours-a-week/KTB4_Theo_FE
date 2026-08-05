@@ -16,7 +16,7 @@ function PostDetailHeader({ post, onDelete }) {
       <div className="post-detail-meta-row">
         <div className="post-author-information">
           <div className="post-detail-profile">
-            <ProfileImage imagePath={post.profileImage} alt="" />
+            <ProfileImage imagePath={post.profileImageUrl} alt="" />
           </div>
           <strong id="post-author-nickname">{getPostNickname(post)}</strong>
           {post.createdAt && (

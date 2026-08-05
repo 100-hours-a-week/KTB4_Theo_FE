@@ -41,7 +41,7 @@ function PostCard({ post }) {
 
         <div className="post-author-area">
           <div className="post-author-profile">
-            <ProfileImage imagePath={post.profileImage} alt="" />
+            <ProfileImage imagePath={post.profileImageUrl} alt="" />
           </div>
           <strong className="post-author-nickname">
             {getPostNickname(post)}

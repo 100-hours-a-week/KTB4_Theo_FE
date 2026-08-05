@@ -9,6 +9,10 @@ import basicProfileImage from '../../assets/images/basic-profile-icon.png'
 import '../../styles/common.css'
 import '../../styles/signup.css'
 import {
+  getImageRequestError,
+  validateImageFiles,
+} from '../../utils/imageFiles.js'
+import {
   isPasswordConfirmed,
   isValidEmail,
   isValidNickname,
@@ -116,7 +120,10 @@ function SignupPage() {
   const canSubmit = isFormValid && !isSubmitting
 
   function validateProfileImage() {
-    const error = profileFile ? '' : '* 프로필 사진을 추가해주세요.'
+    const error = validateImageFiles(
+      profileFile ? [profileFile] : [],
+      { required: true },
+    )
     setErrors((currentErrors) => ({
       ...currentErrors,
       profileImage: error,
@@ -156,6 +163,18 @@ function SignupPage() {
 
     if (!file) {
       validateProfileImage()
+      return
+    }
+
+    const error = validateImageFiles([file], { required: true })
+    if (error) {
+      setProfileFile(null)
+      setProfilePreviewUrl(null)
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        profileImage: error,
+      }))
+      event.target.value = ''
       return
     }
 
@@ -205,6 +224,15 @@ function SignupPage() {
     const message = error?.message
 
     clearApiFieldErrors('', '')
+
+    const imageError = getImageRequestError(error)
+    if (imageError) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        profileImage: imageError,
+      }))
+      return
+    }
 
     if (status === 400) {
       if (message === 'invalid_email_format') {
@@ -281,7 +309,7 @@ function SignupPage() {
         password,
         passwordConfirm,
         nickname: nickname.trim(),
-        profileImage: profileFile?.name ?? null,
+        profileImage: profileFile,
       })
 
       alert('회원가입이 완료되었습니다.')
@@ -312,6 +340,7 @@ function SignupPage() {
         <ProfileImageField
           inputId="profile-image"
           label="프로필 사진*"
+          guide="JPEG, PNG, WebP 형식의 이미지 1장을 최대 5MB까지 업로드할 수 있습니다."
           file={profileFile}
           previewUrl={profilePreviewUrl}
           error={errors.profileImage}

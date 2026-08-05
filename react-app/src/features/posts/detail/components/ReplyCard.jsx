@@ -11,7 +11,7 @@ function ReplyCard({ reply, isEditing, isSubmitting, onEdit, onEditCancel, onUpd
     <article className="reply-card">
       <div className="comment-card-header">
         <div className="comment-author-information">
-          <div className="comment-profile"><ProfileImage imagePath={reply.profileImage} alt="" /></div>
+          <div className="comment-profile"><ProfileImage imagePath={reply.profileImageUrl} alt="" /></div>
           <strong>{getPostNickname(reply)}</strong>
           <time className="comment-date" dateTime={reply.createdAt || ''}>{formatPostDate(reply.createdAt)}</time>
         </div>

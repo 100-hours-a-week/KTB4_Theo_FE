@@ -19,7 +19,7 @@ function CommentCard({ comment, replyTarget, editingReply, isReplySubmitting, on
       <div className="comment-card-header">
         <div className="comment-author-information">
           <div className="comment-profile">
-            <ProfileImage imagePath={comment.profileImage} alt="" />
+            <ProfileImage imagePath={comment.profileImageUrl} alt="" />
           </div>
           <strong>{getPostNickname(comment)}</strong>
           <time className="comment-date" dateTime={comment.createdAt || ''}>

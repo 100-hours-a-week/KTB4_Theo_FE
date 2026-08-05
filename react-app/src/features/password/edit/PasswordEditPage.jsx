@@ -174,7 +174,7 @@ function PasswordEditPage() {
       mainClassName="edit-password-main"
       headerProps={{
         logoClassName: 'edit-password-logo',
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,

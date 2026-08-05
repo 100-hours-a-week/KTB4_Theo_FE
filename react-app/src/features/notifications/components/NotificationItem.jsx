@@ -18,7 +18,7 @@ function NotificationItem({ notification, isOpening, onOpen }) {
       >
         <span className="notification-profile">
           <ProfileImage
-            imagePath={notification.actorProfileImage}
+            imagePath={notification.actorProfileImageUrl}
             alt=""
           />
         </span>

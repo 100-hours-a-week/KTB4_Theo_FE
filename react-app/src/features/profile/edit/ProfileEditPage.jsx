@@ -8,6 +8,7 @@ import ConfirmModal from '../../../components/feedback/ConfirmModal.jsx'
 import StatusToast from '../../../components/feedback/StatusToast.jsx'
 import AppLayout from '../../../components/layout/AppLayout.jsx'
 import useHeaderControls from '../../../hooks/useHeaderControls.js'
+import { getImageRequestError } from '../../../utils/imageFiles.js'
 import '../../../styles/common.css'
 import '../../../styles/profile-edit.css'
 import useAuth from '../../auth/useAuth.js'
@@ -31,6 +32,7 @@ function ProfileEditPage() {
     handleLogout,
   } = useHeaderControls({ logout })
   const [serverNicknameError, setServerNicknameError] = useState('')
+  const [serverProfileImageError, setServerProfileImageError] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const [formRevision, setFormRevision] = useState(0)
   const [isToastVisible, setIsToastVisible] = useState(false)
@@ -43,6 +45,10 @@ function ProfileEditPage() {
 
   const clearServerNicknameError = useCallback(() => {
     setServerNicknameError('')
+  }, [])
+
+  const clearServerProfileImageError = useCallback(() => {
+    setServerProfileImageError('')
   }, [])
 
   const showEditProfileToast = useCallback(() => {
@@ -66,6 +72,13 @@ function ProfileEditPage() {
       const message = error?.message
 
       setServerNicknameError('')
+      setServerProfileImageError('')
+
+      const imageError = getImageRequestError(error)
+      if (imageError) {
+        setServerProfileImageError(imageError)
+        return
+      }
 
       if (status === 400 && message === 'blank_nickname') {
         setServerNicknameError('* 닉네임을 입력해주세요.')
@@ -112,17 +125,14 @@ function ProfileEditPage() {
       }
 
       const trimmedNickname = nickname.trim()
-      const originalProfileImage = user.profileImage || ''
-      const profileImage = profileFile
-        ? profileFile.name
-        : originalProfileImage
-
+      const originalProfileImage = user.profileImageUrl || ''
       setServerNicknameError('')
+      setServerProfileImageError('')
       setIsUpdating(true)
 
       const requestPromise = requestUpdateCurrentUser({
         nickname: trimmedNickname,
-        profileImage,
+        profileImage: profileFile,
       })
         .then((updatedUser) => {
           if (!isMountedRef.current) {
@@ -134,8 +144,8 @@ function ProfileEditPage() {
             ...updatedUser,
             email: updatedUser?.email || user.email || '',
             nickname: updatedUser?.nickname || trimmedNickname,
-            profileImage:
-              updatedUser?.profileImage || originalProfileImage,
+            profileImageUrl:
+              updatedUser?.profileImageUrl || originalProfileImage,
           }
 
           updateCurrentUser(normalizedUser)
@@ -243,7 +253,7 @@ function ProfileEditPage() {
       mainClassName="edit-profile-main"
       headerProps={{
         logoClassName: 'edit-profile-logo',
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,
@@ -268,7 +278,9 @@ function ProfileEditPage() {
             user={user}
             isSubmitting={isUpdating}
             serverNicknameError={serverNicknameError}
+            serverProfileImageError={serverProfileImageError}
             onClearServerError={clearServerNicknameError}
+            onClearProfileImageError={clearServerProfileImageError}
             onSubmit={handleSubmit}
             onWithdrawalRequest={handleWithdrawalRequest}
           />

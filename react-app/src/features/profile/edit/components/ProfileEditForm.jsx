@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { isValidNickname, NICKNAME_MAX_LENGTH } from '../../../auth/authValidation.js'
 import { validateNickname } from '../utils/profileValidation.js'
+import { validateImageFiles } from '../../../../utils/imageFiles.js'
 import ProfileEditImageField from './ProfileEditImageField.jsx'
 import WithdrawalPanel from './WithdrawalPanel.jsx'
 
@@ -8,20 +9,27 @@ function ProfileEditForm({
   user,
   isSubmitting,
   serverNicknameError = '',
+  serverProfileImageError = '',
   onClearServerError,
+  onClearProfileImageError,
   onSubmit,
   onWithdrawalRequest,
 }) {
   const originalNickname = user.nickname || ''
-  const originalProfileImage = user.profileImage || ''
+  const originalProfileImage = user.profileImageUrl || ''
   const [nickname, setNickname] = useState(originalNickname)
   const [profileFile, setProfileFile] = useState(null)
+  const [profileImageError, setProfileImageError] = useState('')
   const [nicknameError, setNicknameError] = useState('')
   const trimmedNickname = nickname.trim()
   const hasChanged =
     trimmedNickname !== originalNickname || profileFile !== null
   const canSubmit =
-    isValidNickname(trimmedNickname) && hasChanged && !isSubmitting
+    isValidNickname(trimmedNickname) &&
+    hasChanged &&
+    !profileImageError &&
+    !serverProfileImageError &&
+    !isSubmitting
   const displayedNicknameError =
     nicknameError || serverNicknameError || ''
 
@@ -40,11 +48,23 @@ function ProfileEditForm({
     const nextNicknameError = validateNickname(nickname)
     setNicknameError(nextNicknameError)
 
-    if (nextNicknameError || !hasChanged) {
+    if (
+      nextNicknameError ||
+      profileImageError ||
+      serverProfileImageError ||
+      !hasChanged
+    ) {
       return
     }
 
     onSubmit({ nickname, profileFile })
+  }
+
+  function handleProfileImageChange(file) {
+    const error = validateImageFiles(file ? [file] : [])
+    setProfileImageError(error)
+    onClearProfileImageError()
+    setProfileFile(error ? null : file)
   }
 
   return (
@@ -53,7 +73,9 @@ function ProfileEditForm({
         <ProfileEditImageField
           originalImagePath={originalProfileImage}
           selectedFile={profileFile}
-          onChange={setProfileFile}
+          disabled={isSubmitting}
+          error={profileImageError || serverProfileImageError}
+          onChange={handleProfileImageChange}
         />
 
         <div className="edit-profile-field">

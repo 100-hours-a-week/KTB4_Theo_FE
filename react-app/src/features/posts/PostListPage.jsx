@@ -138,7 +138,7 @@ function PostListPage() {
       headerClassName="posts-header"
       mainClassName="posts-main"
       headerProps={{
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,

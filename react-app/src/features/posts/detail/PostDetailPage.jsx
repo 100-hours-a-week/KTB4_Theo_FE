@@ -574,7 +574,7 @@ function PostDetailPage() {
       mainClassName="post-main"
       headerProps={{
         logoClassName: 'post-logo',
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,

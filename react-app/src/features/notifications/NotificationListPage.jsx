@@ -216,7 +216,7 @@ function NotificationListPage() {
       headerClassName="posts-header"
       mainClassName="notifications-main"
       headerProps={{
-        profileImagePath: user?.profileImage,
+        profileImagePath: user?.profileImageUrl,
         isProfileMenuOpen,
         onProfileMenuToggle: toggleProfileMenu,
         onProfileMenuClose: closeProfileMenu,

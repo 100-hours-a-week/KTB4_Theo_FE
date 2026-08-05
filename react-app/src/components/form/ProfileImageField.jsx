@@ -1,6 +1,7 @@
 function ProfileImageField({
   inputId,
   label,
+  guide = '',
   file,
   previewUrl,
   error = '',
@@ -26,6 +27,7 @@ function ProfileImageField({
       <label className="profile-label" htmlFor={inputId}>
         {label}
       </label>
+      {guide && <p className="profile-image-policy-guide">{guide}</p>}
       <p className="helper-text profile-helper" id={helperId}>
         {error}
       </p>
@@ -57,7 +59,7 @@ function ProfileImageField({
         id={inputId}
         name="profileImage"
         value=""
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? helperId : undefined}
         onChange={onChange}
