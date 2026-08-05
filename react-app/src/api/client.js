@@ -59,6 +59,8 @@ async function fetchApi(url, options = {}) {
   const fetchOptions = { ...options }
   const includeAccessToken = fetchOptions.includeAccessToken !== false
   const headers = fetchOptions.headers
+  const isFormData =
+    typeof FormData !== 'undefined' && fetchOptions.body instanceof FormData
 
   delete fetchOptions.includeAccessToken
   delete fetchOptions.retryOnUnauthorized
@@ -68,7 +70,7 @@ async function fetchApi(url, options = {}) {
     ...fetchOptions,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...(!isFormData && { 'Content-Type': 'application/json' }),
       ...(includeAccessToken &&
         getAccessToken() && {
           Authorization: `Bearer ${getAccessToken()}`,

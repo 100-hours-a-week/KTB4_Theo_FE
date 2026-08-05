@@ -29,10 +29,11 @@ export async function getPost(postId) {
   return result?.data
 }
 
-export async function createPost({ title, content, imageUrls = [] }) {
+export async function createPost({ title, content, images = [] }) {
+  const formData = createPostFormData({ title, content }, 'images', images)
   const result = await request('/posts', {
     method: 'POST',
-    body: JSON.stringify({ title, content, imageUrls }),
+    body: formData,
   })
 
   return result?.data
@@ -40,12 +41,28 @@ export async function createPost({ title, content, imageUrls = [] }) {
 
 export async function updatePost(
   postId,
-  { title, content, imageUrls = [] },
+  { title, content, retainedImageIds = [], newImages = [] },
 ) {
+  const formData = createPostFormData(
+    { title, content, retainedImageIds },
+    'newImages',
+    newImages,
+  )
+
   await request(`/posts/${postId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ title, content, imageUrls }),
+    body: formData,
   })
+}
+
+function createPostFormData(requestPayload, imagePartName, images) {
+  const formData = new FormData()
+  formData.append(
+    'request',
+    new Blob([JSON.stringify(requestPayload)], { type: 'application/json' }),
+  )
+  images.forEach((image) => formData.append(imagePartName, image))
+  return formData
 }
 
 export async function togglePostLike(postId) {
