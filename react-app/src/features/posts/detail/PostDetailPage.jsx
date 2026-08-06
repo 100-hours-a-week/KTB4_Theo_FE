@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useLocation, useNavigate, useParams } from 'react-router'
 import {
   createComment,
   createReply,
@@ -32,6 +32,7 @@ function parsePostId(postIdParam) {
 }
 
 function PostDetailPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { postId: postIdParam } = useParams()
   const postId = useMemo(() => parsePostId(postIdParam), [postIdParam])
@@ -547,6 +548,7 @@ function PostDetailPage() {
   }, [applyPostResponse, getPostRequest, handlePostDetailError, navigate, postId])
 
   const post = loadedPost?.postId === postId ? loadedPost.post : null
+  const isPostLoaded = Boolean(post)
   const comments = Array.isArray(post?.comments) ? post.comments : []
   const editingComment =
     editingCommentTarget?.postId === postId
@@ -555,17 +557,32 @@ function PostDetailPage() {
   const isCommentSubmitting = isCommentCreating || isCommentUpdating
 
   useEffect(() => {
-    if (!post || !window.location.hash.startsWith('#comment-')) {
-      return
+    if (!isPostLoaded || !location.hash.startsWith('#comment-')) {
+      return undefined
     }
 
-    const target = document.getElementById(window.location.hash.slice(1))
+    const target = document.getElementById(location.hash.slice(1))
 
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      target.focus?.({ preventScroll: true })
+    if (!target) {
+      return undefined
     }
-  }, [post])
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    target.focus({ preventScroll: true })
+
+    target.classList.remove('is-highlighted')
+    void target.offsetWidth
+    target.classList.add('is-highlighted')
+
+    const timeoutId = window.setTimeout(() => {
+      target.classList.remove('is-highlighted')
+    }, 2500)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      target.classList.remove('is-highlighted')
+    }
+  }, [isPostLoaded, location.hash, location.key])
 
   return (
     <AppLayout

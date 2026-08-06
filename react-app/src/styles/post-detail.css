@@ -158,7 +158,11 @@
   border: 1px solid rgba(148, 170, 178, 0.24);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 45% 35%, rgba(88, 244, 207, 0.28), transparent 34%),
+    radial-gradient(
+      circle at 45% 35%,
+      rgba(88, 244, 207, 0.28),
+      transparent 34%
+    ),
     rgba(255, 255, 255, 0.12);
 }
 
@@ -275,7 +279,9 @@
   height: 48px;
   object-fit: contain;
   opacity: 0.92;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .gallery-navigation:hover img {
@@ -338,7 +344,11 @@
   border: 1px solid rgba(148, 170, 178, 0.2);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03)
+    ),
     rgba(12, 18, 24, 0.76);
   color: var(--color-auth-text);
   font-family: inherit;
@@ -375,7 +385,8 @@
 }
 
 .like-statistic.liked img {
-  filter: invert(83%) sepia(57%) saturate(545%) hue-rotate(103deg) brightness(101%) contrast(94%);
+  filter: invert(83%) sepia(57%) saturate(545%) hue-rotate(103deg)
+    brightness(101%) contrast(94%);
 }
 
 .like-statistic.liked strong {
@@ -478,13 +489,38 @@
   border: 1px solid rgba(148, 170, 178, 0.18);
   border-radius: 8px;
   background-color: rgba(12, 18, 24, 0.72);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
-.comment-card:target {
-  border-color: rgba(88, 244, 207, 0.62);
-  box-shadow: 0 0 0 4px rgba(88, 244, 207, 0.08);
+.comment-card.is-highlighted {
+  border-color: rgba(88, 244, 207, 0.9);
+  background-color: rgba(88, 244, 207, 0.16);
+  box-shadow: 0 0 0 5px rgba(88, 244, 207, 0.14);
   outline: none;
+  animation: comment-highlight 2.5s ease-out forwards;
+}
+
+@keyframes comment-highlight {
+  0%,
+  30% {
+    border-color: rgba(88, 244, 207, 0.9);
+    background-color: rgba(88, 244, 207, 0.16);
+    box-shadow: 0 0 0 5px rgba(88, 244, 207, 0.14);
+  }
+
+  100% {
+    border-color: rgba(148, 170, 178, 0.18);
+    background-color: rgba(12, 18, 24, 0.72);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-card.is-highlighted {
+    animation: none;
+  }
 }
 
 .reply-form {
@@ -541,10 +577,16 @@
   height: 30px;
 }
 
-.reply-card .comment-content { margin-left: 50px; }
-.reply-card .reply-form { margin-left: 50px; }
+.reply-card .comment-content {
+  margin-left: 50px;
+}
+.reply-card .reply-form {
+  margin-left: 50px;
+}
 
-.reply-menu { position: relative; }
+.reply-menu {
+  position: relative;
+}
 .reply-menu-button {
   padding: 4px 8px;
   border: 0;
@@ -572,7 +614,9 @@
   color: var(--color-auth-text);
   cursor: pointer;
 }
-.reply-menu-items button:hover { background: rgba(88, 244, 207, 0.12); }
+.reply-menu-items button:hover {
+  background: rgba(88, 244, 207, 0.12);
+}
 
 .comment-card-header {
   display: flex;
@@ -648,7 +692,11 @@
   border: 1px solid rgba(148, 170, 178, 0.22);
   border-radius: 14px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.02)
+    ),
     rgba(12, 18, 24, 0.96);
   text-align: center;
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
@@ -815,5 +863,7 @@
   }
 
   .reply-card .comment-content,
-  .reply-card .reply-form { margin-left: 0; }
+  .reply-card .reply-form {
+    margin-left: 0;
+  }
 }
