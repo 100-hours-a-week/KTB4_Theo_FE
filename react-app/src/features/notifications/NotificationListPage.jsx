@@ -1,215 +1,246 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   getNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
-} from '../../api/notificationApi.js'
-import AppLayout from '../../components/layout/AppLayout.jsx'
+} from "../../api/notificationApi.js";
+import AppLayout from "../../components/layout/AppLayout.jsx";
 import {
   NOTIFICATION_RECEIVED_EVENT,
   notifyUnreadCountChanged,
-} from './notificationEvents.js'
-import useHeaderControls from '../../hooks/useHeaderControls.js'
-import '../../styles/common.css'
-import '../../styles/notifications.css'
-import useAuth from '../auth/useAuth.js'
-import useInfiniteScroll from '../posts/hooks/useInfiniteScroll.js'
-import NotificationItem from './components/NotificationItem.jsx'
-import { getNotificationTarget } from './notificationFormatters.js'
+} from "./notificationEvents.js";
+import useHeaderControls from "../../hooks/useHeaderControls.js";
+import "../../styles/common.css";
+import "../../styles/notifications.css";
+import useAuth from "../auth/useAuth.js";
+import useInfiniteScroll from "../posts/hooks/useInfiniteScroll.js";
+import NotificationItem from "./components/NotificationItem.jsx";
+import { getNotificationTarget } from "./notificationFormatters.js";
 
 function NotificationListPage() {
-  const navigate = useNavigate()
-  const { user, logout, isLoggingOut } = useAuth()
+  const navigate = useNavigate();
+  const { user, logout, isLoggingOut } = useAuth();
   const {
     isProfileMenuOpen,
     closeProfileMenu,
     toggleProfileMenu,
     handleLogout,
-  } = useHeaderControls({ logout })
-  const [notifications, setNotifications] = useState([])
-  const [hasNext, setHasNext] = useState(true)
-  const [isInitialLoading, setIsInitialLoading] = useState(true)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const [isMarkingAll, setIsMarkingAll] = useState(false)
-  const [openingNotificationId, setOpeningNotificationId] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('')
-  const nextCursorRef = useRef(null)
-  const requestPromiseRef = useRef(null)
-  const hasRequestedInitialPageRef = useRef(false)
-  const isMountedRef = useRef(false)
+  } = useHeaderControls({ logout });
+  const [notifications, setNotifications] = useState([]);
+  const [hasNext, setHasNext] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isMarkingAll, setIsMarkingAll] = useState(false);
+  const [openingNotificationId, setOpeningNotificationId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const nextCursorRef = useRef(null);
+  const requestPromiseRef = useRef(null);
+  const hasRequestedInitialPageRef = useRef(false);
+  const isMountedRef = useRef(false);
 
   const readNotificationList = useCallback(
-    ({ initial = false } = {}) => {
+    ({
+      initial = false, // 알림 목록을 처음 불러오는 경우에는 initial을 true로 설정
+      synchronize = false, // 알림 목록을 서버와 동기화하는 경우에는 synchronize를 true로 설정
+      silent = false, // 알림 목록을 불러오는 동안 로딩 상태를 표시하지 않는 경우에는 silent를 true로 설정
+    } = {}) => {
       if (requestPromiseRef.current) {
-        return requestPromiseRef.current
+        return requestPromiseRef.current;
       }
 
       if (!initial && !hasNext) {
-        return Promise.resolve()
+        return Promise.resolve();
       }
 
-      setErrorMessage('')
-      initial ? setIsInitialLoading(true) : setIsLoadingMore(true)
+      setErrorMessage("");
+
+      if (!silent) {
+        initial ? setIsInitialLoading(true) : setIsLoadingMore(true);
+      }
 
       const requestPromise = getNotifications({
         lastNotificationId: initial ? null : nextCursorRef.current,
       })
         .then((data) => {
           if (!isMountedRef.current) {
-            return
+            return;
           }
 
           const nextNotifications = Array.isArray(data?.notifications)
             ? data.notifications
-            : []
+            : [];
 
-          setNotifications((current) =>
-            initial
-              ? nextNotifications
-              : [...current, ...nextNotifications],
-          )
-          setHasNext(Boolean(data?.hasNext))
-          nextCursorRef.current = data?.nextCursor ?? null
+          setNotifications((current) => {
+            if (synchronize) {
+              return mergeNotifications(current, nextNotifications);
+            }
+
+            if (initial) {
+              return nextNotifications;
+            }
+
+            return mergeNotifications(current, nextNotifications);
+          });
+
+          setHasNext(Boolean(data?.hasNext));
+          nextCursorRef.current = data?.nextCursor ?? null;
         })
         .catch((error) => {
-          console.error(error)
+          console.error(error);
 
           if (isMountedRef.current) {
-            setErrorMessage('알림을 불러오지 못했습니다. 다시 시도해주세요.')
+            setErrorMessage("알림을 불러오지 못했습니다. 다시 시도해주세요.");
           }
         })
         .finally(() => {
-          requestPromiseRef.current = null
+          requestPromiseRef.current = null;
 
-          if (isMountedRef.current) {
-            setIsInitialLoading(false)
-            setIsLoadingMore(false)
+          if (isMountedRef.current && !silent) {
+            setIsInitialLoading(false);
+            setIsLoadingMore(false);
           }
-        })
+        });
 
-      requestPromiseRef.current = requestPromise
-      return requestPromise
+      requestPromiseRef.current = requestPromise;
+      return requestPromise;
     },
     [hasNext],
-  )
+  );
 
   const handleNotificationOpen = useCallback(
     async (notification) => {
       if (openingNotificationId !== null) {
-        return
+        return;
       }
 
-      setOpeningNotificationId(notification.notificationId)
+      setOpeningNotificationId(notification.notificationId);
 
       try {
         if (!notification.read) {
-          await markNotificationAsRead(notification.notificationId)
-          notifyUnreadCountChanged()
+          await markNotificationAsRead(notification.notificationId);
+          notifyUnreadCountChanged();
         }
 
-        navigate(getNotificationTarget(notification))
+        navigate(getNotificationTarget(notification));
       } catch (error) {
-        console.error(error)
-        setOpeningNotificationId(null)
-        setErrorMessage('알림을 여는 중 오류가 발생했습니다.')
+        console.error(error);
+        setOpeningNotificationId(null);
+        setErrorMessage("알림을 여는 중 오류가 발생했습니다.");
       }
     },
     [navigate, openingNotificationId],
-  )
+  );
 
   const handleMarkAllAsRead = useCallback(async () => {
     if (isMarkingAll) {
-      return
+      return;
     }
 
-    setIsMarkingAll(true)
-    setErrorMessage('')
+    setIsMarkingAll(true);
+    setErrorMessage("");
 
     try {
-      await markAllNotificationsAsRead()
+      await markAllNotificationsAsRead();
       setNotifications((current) =>
         current.map((notification) => ({
           ...notification,
           read: true,
         })),
-      )
-      notifyUnreadCountChanged()
+      );
+      notifyUnreadCountChanged();
     } catch (error) {
-      console.error(error)
-      setErrorMessage('전체 읽음 처리에 실패했습니다.')
+      console.error(error);
+      setErrorMessage("전체 읽음 처리에 실패했습니다.");
     } finally {
       if (isMountedRef.current) {
-        setIsMarkingAll(false)
+        setIsMarkingAll(false);
       }
     }
-  }, [isMarkingAll])
+  }, [isMarkingAll]);
 
   const sentinelRef = useInfiniteScroll({
     hasNext,
     isLoading: isInitialLoading || isLoadingMore,
     onLoadMore: readNotificationList,
     refreshKey: notifications.length,
-  })
+  });
 
+  // 컴포넌트 마운트 상태 관리
   useEffect(() => {
-    isMountedRef.current = true
+    isMountedRef.current = true;
 
     return () => {
-      isMountedRef.current = false
-    }
-  }, [])
+      isMountedRef.current = false;
+    };
+  }, []);
 
+  // 알림 목록을 초기 로딩하는 useEffect
   useEffect(() => {
     if (!hasRequestedInitialPageRef.current) {
-      hasRequestedInitialPageRef.current = true
-      readNotificationList({ initial: true })
+      hasRequestedInitialPageRef.current = true;
+      readNotificationList({ initial: true });
     }
-  }, [readNotificationList])
+  }, [readNotificationList]);
 
   const hasUnreadNotifications = notifications.some(
     (notification) => !notification.read,
-  )
+  );
 
+  // 탭 복귀 시 DB 기준으로 최신 알림 목록 동기화
   useEffect(() => {
-  function handleNotificationReceived(event) {
-    const receivedNotification = event.detail
-
-    if (!receivedNotification?.notificationId) {
-      return
-    }
-
-    setNotifications((current) => {
-      const alreadyExists = current.some(
-        (notification) =>
-          notification.notificationId ===
-          receivedNotification.notificationId,
-      )
-
-      if (alreadyExists) {
-        return current
+    function handleVisibilityChange() {
+      if (document.visibilityState !== "visible") {
+        return;
       }
 
-      return [
-        receivedNotification,
-        ...current,
-      ]
-    })
-  }
+      readNotificationList({
+        initial: true,
+        synchronize: true,
+        silent: true,
+      });
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [readNotificationList]);
 
-  window.addEventListener(
-    NOTIFICATION_RECEIVED_EVENT,
-    handleNotificationReceived,
-  )
+  // SSE로 실시간 알림을 수신했을 때 목록에 추가
+  useEffect(() => {
+    function handleNotificationReceived(event) {
+      const receivedNotification = event.detail;
 
-  return () => {
-    window.removeEventListener(
+      if (!receivedNotification?.notificationId) {
+        return;
+      }
+
+      setNotifications((current) => {
+        const alreadyExists = current.some(
+          (notification) =>
+            notification.notificationId === receivedNotification.notificationId,
+        );
+
+        if (alreadyExists) {
+          return current;
+        }
+
+        return [receivedNotification, ...current];
+      });
+    }
+
+    window.addEventListener(
       NOTIFICATION_RECEIVED_EVENT,
       handleNotificationReceived,
-    )
-  }
-}, [])
+    );
 
+    return () => {
+      window.removeEventListener(
+        NOTIFICATION_RECEIVED_EVENT,
+        handleNotificationReceived,
+      );
+    };
+  }, []);
   return (
     <AppLayout
       pageClassName="notifications-page"
@@ -242,7 +273,7 @@ function NotificationListPage() {
             disabled={!hasUnreadNotifications || isMarkingAll}
             onClick={handleMarkAllAsRead}
           >
-            {isMarkingAll ? '처리 중...' : '모두 읽음'}
+            {isMarkingAll ? "처리 중..." : "모두 읽음"}
           </button>
         </div>
 
@@ -299,7 +330,26 @@ function NotificationListPage() {
         />
       </section>
     </AppLayout>
-  )
+  );
 }
 
-export default NotificationListPage
+// 알림 목록을 병합하는 함수 (기존 알림과 새로 조회된 알림을 보존, 최신 notificationId 기준으로 정렬)
+function mergeNotifications(currentNotifications, incomingNotifications) {
+  const notificationsById = new Map();
+
+  currentNotifications.forEach((notification) => {
+    notificationsById.set(notification.notificationId, notification);
+  });
+
+  incomingNotifications.forEach((notification) => {
+    // DB에서 새로 조회한 상태를 우선 사용
+    notificationsById.set(notification.notificationId, notification);
+  });
+
+  return Array.from(notificationsById.values()).sort(
+    (first, second) =>
+      Number(second.notificationId) - Number(first.notificationId),
+  );
+}
+
+export default NotificationListPage;
