@@ -4,6 +4,25 @@ import { API_BASE_URL } from "../../api/client.js";
 import useAuth from "../auth/useAuth.js";
 import { notifyNotificationReceived } from "./notificationEvents.js";
 
+const SSE_CLIENT_ID_STORAGE_KEY = "notification-sse-client-id";
+
+// SSE 연결을 위한 고유한 클라이언트 ID를 생성하거나 가져오는 함수
+function getOrCreateSseClientId() {
+  const storedClientId = window.sessionStorage.getItem(
+    SSE_CLIENT_ID_STORAGE_KEY,
+  );
+
+  if (storedClientId) {
+    return storedClientId;
+  }
+
+  const newClientId = window.crypto.randomUUID();
+
+  window.sessionStorage.setItem(SSE_CLIENT_ID_STORAGE_KEY, newClientId);
+
+  return newClientId;
+}
+
 function NotificationSseConnector() {
   const { accessToken, isAuthenticated } = useAuth();
 
@@ -12,8 +31,13 @@ function NotificationSseConnector() {
       return undefined;
     }
 
+    // SSE 연결을 위한 고유한 클라이언트 ID
+    const clientId = getOrCreateSseClientId();
+
     // SSE 연결을 관리하기 위한 컨트롤러
     const controller = new AbortController();
+
+    // SSE 정상 종료 후 실행할 재연결 타이머 ID
     let reconnectTimerId = null;
 
     async function connect() {
@@ -26,6 +50,7 @@ function NotificationSseConnector() {
             headers: {
               Accept: "text/event-stream",
               Authorization: `Bearer ${accessToken}`,
+              "X-SSE-Client-Id": clientId,
             },
             // AbortController를 사용하여 연결을 취소할 수 있도록 설정
             signal: controller.signal,
@@ -46,7 +71,10 @@ function NotificationSseConnector() {
             // SSE 이벤트 수신
             onmessage(event) {
               if (event.event === "connect") {
-                console.log("SSE 연결 완료:", event.data);
+                console.log("SSE 연결 완료:", {
+                  clientId,
+                  data: event.data,
+                });
                 return;
               }
 
