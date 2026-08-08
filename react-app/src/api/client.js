@@ -80,7 +80,7 @@ async function fetchApi(url, options = {}) {
   })
 }
 
-async function reissueAccessToken() {
+export async function reissueAccessToken() {
   if (!reissuePromise) {
     reissuePromise = fetch(API_BASE_URL + '/auth/reissue', {
       method: 'POST',

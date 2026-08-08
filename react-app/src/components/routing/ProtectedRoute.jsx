@@ -24,6 +24,10 @@ function ProtectedRoute() {
       return undefined
     }
 
+    if (status !== 'initializing' && !accessToken) {
+      return undefined
+    }
+
     let isActive = true
 
     initializeAuth()
@@ -33,9 +37,8 @@ function ProtectedRoute() {
         }
       })
       .catch((error) => {
-        console.error(error)
-
         if (isActive) {
+          console.error(error)
           setStatus('failed')
         }
       })
@@ -43,7 +46,7 @@ function ProtectedRoute() {
     return () => {
       isActive = false
     }
-  }, [initializeAuth, user])
+  }, [accessToken, initializeAuth, status, user])
 
   async function handleRetry() {
     if (isRetrying) {
@@ -71,7 +74,7 @@ function ProtectedRoute() {
     }
   }
 
-  if (user) {
+  if (accessToken && user) {
     return <Outlet />
   }
 
@@ -79,7 +82,7 @@ function ProtectedRoute() {
     return <LoadingView />
   }
 
-  if (status === 'failed' && !accessToken) {
+  if (!accessToken) {
     return (
       <Navigate
         to="/login"

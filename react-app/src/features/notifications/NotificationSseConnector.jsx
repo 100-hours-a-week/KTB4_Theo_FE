@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { API_BASE_URL } from "../../api/client.js";
+import {
+  API_BASE_URL,
+  reissueAccessToken,
+} from "../../api/client.js";
 import useAuth from "../auth/useAuth.js";
 import { notifyNotificationReceived } from "./notificationEvents.js";
 
@@ -60,7 +63,10 @@ function NotificationSseConnector() {
               const contentType = response.headers.get("content-type");
 
               if (!response.ok) {
-                throw new Error(`SSE 연결 실패: ${response.status}`);
+                const error = new Error(`SSE 연결 실패: ${response.status}`);
+                error.status = response.status;
+
+                throw error;
               }
 
               if (!contentType?.includes("text/event-stream")) {
@@ -107,12 +113,36 @@ function NotificationSseConnector() {
                 connect();
               }, 3_000);
             },
+
+            // 인증 오류는 외부에서 토큰을 재발급하고,
+            // 그 외 일시적인 오류는 fetchEventSource의 기본 재시도에 맡김
+            onerror(error) {
+              if (error?.status === 401) {
+                throw error;
+              }
+
+              return undefined;
+            },
           },
         );
       } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("SSE 구독 실패:", error);
+        if (controller.signal.aborted) {
+          return;
         }
+
+        if (error?.status === 401) {
+          try {
+            await reissueAccessToken();
+          } catch (reissueError) {
+            if (!controller.signal.aborted) {
+              console.error("SSE 인증 갱신 실패:", reissueError);
+            }
+          }
+
+          return;
+        }
+
+        console.error("SSE 구독 실패:", error);
       }
     }
 

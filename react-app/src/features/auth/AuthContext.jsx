@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -29,6 +30,16 @@ function AuthProvider({ children }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const initializationPromiseRef = useRef(null)
   const logoutPromiseRef = useRef(null)
+
+  useEffect(
+    () =>
+      subscribeAccessToken(() => {
+        if (!getAccessToken()) {
+          setUser(null)
+        }
+      }),
+    [],
+  )
 
   const clearAuth = useCallback(() => {
     clearAccessToken()
