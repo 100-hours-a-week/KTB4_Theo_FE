@@ -1,13 +1,33 @@
 import { useEffect } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import {
-  API_BASE_URL,
-  reissueAccessToken,
-} from "../../api/client.js";
+import { API_BASE_URL, reissueAccessToken } from "../../api/client.js";
 import useAuth from "../auth/useAuth.js";
 import { notifyNotificationReceived } from "./notificationEvents.js";
 
 const SSE_CLIENT_ID_STORAGE_KEY = "notification-sse-client-id";
+// 고유한 클라이언트 ID를 생성하는 함수
+function createSseClientId() {
+  if (typeof window.crypto?.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  const bytes = new Uint8Array(16);
+  window.crypto.getRandomValues(bytes);
+
+  // RFC 4122 version 4 UUID 형식으로 설정
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+
+  return [
+    hex.slice(0, 4).join(""),
+    hex.slice(4, 6).join(""),
+    hex.slice(6, 8).join(""),
+    hex.slice(8, 10).join(""),
+    hex.slice(10, 16).join(""),
+  ].join("-");
+}
 
 // SSE 연결을 위한 고유한 클라이언트 ID를 생성하거나 가져오는 함수
 function getOrCreateSseClientId() {
@@ -19,7 +39,7 @@ function getOrCreateSseClientId() {
     return storedClientId;
   }
 
-  const newClientId = window.crypto.randomUUID();
+  const newClientId = createSseClientId();
 
   window.sessionStorage.setItem(SSE_CLIENT_ID_STORAGE_KEY, newClientId);
 
