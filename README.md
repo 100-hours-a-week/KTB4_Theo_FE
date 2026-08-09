@@ -171,29 +171,39 @@
 
 | 로그인 | 회원가입 |
 | --- | --- |
-| <!-- ![로그인](docs/images/login.png) --> 스크린샷 추가 예정 | <!-- ![회원가입](docs/images/signup.png) --> 스크린샷 추가 예정 |
+| <!-- ![로그인](docs/images/login.png) --> <img width="710" height="715" alt="image" src="https://github.com/user-attachments/assets/7db0d65e-4372-40df-a972-e847ce48a85a" />
+ | <!-- ![회원가입](docs/images/signup.png) --> <img width="673" height="1068" alt="image" src="https://github.com/user-attachments/assets/04d42d32-4c98-433f-a79a-f6428c28a655" />
+ |
 
 ### 게시글 목록 / 상세
 
 | 게시글 목록 | 게시글 상세 |
 | --- | --- |
-| <!-- ![게시글 목록](docs/images/posts.png) --> 스크린샷 추가 예정 | <!-- ![게시글 상세](docs/images/post-detail.png) --> 스크린샷 추가 예정 |
+| <!-- ![게시글 목록](docs/images/posts.png) --> <img width="1442" height="510" alt="image" src="https://github.com/user-attachments/assets/b306140e-cd30-4ca6-972a-a64d1ab272bc" />
+ | <!-- ![게시글 상세](docs/images/post-detail.png) -->  <img width="1648" height="1071" alt="image" src="https://github.com/user-attachments/assets/371e3591-4574-4d5e-8475-bebd1da7ff11" />
+|
 
 ### 게시글 작성 / 수정
 
 | 게시글 작성 | 게시글 수정 |
 | --- | --- |
-| <!-- ![게시글 작성](docs/images/post-create.png) --> 스크린샷 추가 예정 | <!-- ![게시글 수정](docs/images/post-edit.png) --> 스크린샷 추가 예정 |
+| <!-- ![게시글 작성](docs/images/post-create.png) --> <img width="1659" height="1081" alt="image" src="https://github.com/user-attachments/assets/a3762fba-1f8d-4597-9334-8378d1fc6148" />
+ | <!-- ![게시글 수정](docs/images/post-edit.png) --> <img width="686" height="1038" alt="image" src="https://github.com/user-attachments/assets/f10f818c-34ff-4f88-baa9-37b5a2405a19" />
+ |
 
 ### 실시간 알림 / 댓글 이동
 
-| 실시간 알림 | 알림을 통한 댓글 이동 |
+| 실시간 알림 목록 조회| 알림을 통한 댓글 확인 |
 | --- | --- |
-| <!-- ![실시간 알림](docs/images/notification.gif) --> GIF 추가 예정 | <!-- ![댓글 딥링크](docs/images/comment-deep-link.gif) --> GIF 추가 예정 |
+| <!-- ![실시간 알림](docs/images/notification.png) --> <img width="1407" height="485" alt="image" src="https://github.com/user-attachments/assets/e381beef-9e1d-4782-b724-17e260fcd260" />
+| <!-- ![댓글 딥링크](docs/images/comment-deep-link.png) --> <img width="1325" height="409" alt="image" src="https://github.com/user-attachments/assets/00bb29cf-e15d-43c2-86c2-43c373196e0d" />
+ |
 
 ### 프로필 / 비밀번호 수정
 
 | 프로필 수정 | 비밀번호 수정 |
 | --- | --- |
-| <!-- ![프로필 수정](docs/images/profile-edit.png) --> 스크린샷 추가 예정 | <!-- ![비밀번호 수정](docs/images/password-edit.png) --> 스크린샷 추가 예정 |
+| <!-- ![프로필 수정](docs/images/profile-edit.png) --> <img width="596" height="850" alt="image" src="https://github.com/user-attachments/assets/b9666a5b-e5dd-4279-83d9-5ca94d8a979f" />
+ | <!-- ![비밀번호 수정](docs/images/password-edit.png) --> <img width="599" height="548" alt="image" src="https://github.com/user-attachments/assets/8979cc29-92bb-453c-a212-43a92d8d6a34" />
+ |
 
