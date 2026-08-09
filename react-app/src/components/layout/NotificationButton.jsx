@@ -9,26 +9,41 @@ import {
 function NotificationButton() {
   const [unreadCount, setUnreadCount] = useState(0);
   const requestPromiseRef = useRef(null); // 요청 promise 를 저장하는 Ref
+  const refreshVersionRef = useRef(0); // 마지막으로 요청된 갱신 버전
   const isMountedRef = useRef(false); // 알림 컴포넌트가 마운트 상태인지 추적하는 Ref
 
   const refreshUnreadCount = useCallback(() => {
+    refreshVersionRef.current += 1;
+
     if (requestPromiseRef.current) {
       return requestPromiseRef.current;
     }
 
-    const requestPromise = getUnreadNotificationCount()
-      .then((count) => {
-        if (isMountedRef.current) {
-          // 컴포넌트가 마운트 상태일 때만 읽지않은 알림 개수 업데이트
-          setUnreadCount(Number.isFinite(Number(count)) ? Number(count) : 0);
+    async function fetchLatestUnreadCount() {
+      let requestedVersion;
+
+      do {
+        requestedVersion = refreshVersionRef.current;
+
+        try {
+          const count = await getUnreadNotificationCount();
+
+          if (isMountedRef.current) {
+            // 컴포넌트가 마운트 상태일 때만 읽지않은 알림 개수 업데이트
+            setUnreadCount(Number.isFinite(Number(count)) ? Number(count) : 0);
+          }
+        } catch (error) {
+          console.error("미읽음 알림 개수를 불러오지 못했습니다.", error);
         }
-      })
-      .catch((error) => {
-        console.error("미읽음 알림 개수를 불러오지 못했습니다.", error);
-      })
-      .finally(() => {
-        requestPromiseRef.current = null;
-      });
+      } while (
+        isMountedRef.current &&
+        requestedVersion !== refreshVersionRef.current
+      );
+    }
+
+    const requestPromise = fetchLatestUnreadCount().finally(() => {
+      requestPromiseRef.current = null;
+    });
 
     requestPromiseRef.current = requestPromise;
     return requestPromise;
