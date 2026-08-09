@@ -43,6 +43,10 @@
 
 - Back-end GitHub: https://github.com/100-hours-a-week/KTB4_Theo_BE
 
+## 시연 영상
+
+- 시연 영상 유튜브 링크 : https://www.youtube.com/watch?v=SQUS1Fl9Xo0
+
 ## 주요 기능
 
 ### User
