@@ -237,9 +237,6 @@
   <img src="docs/images/password_edit_page.png" width="720" alt="코드 한입 비밀번호 수정 화면" />
 </p>
 
-### 프로젝트 후기
-## 프로젝트 후기
-
 ## 프로젝트 후기
 
 이번 프로젝트에서는 Vanilla JavaScript로 구현했던 서비스를 React 기반 SPA로 마이그레이션하며, 단순히 화면을 컴포넌트로 나누는 것보다 상태와 책임의 경계를 명확히 설계하는 일이 더 중요하다는 것을 배웠습니다.
