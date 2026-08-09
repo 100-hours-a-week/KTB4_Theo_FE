@@ -39,7 +39,7 @@
 
 <!-- Back-end 저장소 주소를 확정한 후 추가해 주세요. -->
 
-- Back-end GitHub: 
+- Back-end GitHub: https://github.com/100-hours-a-week/KTB4_Theo_BE
 
 ## 주요 기능
 
