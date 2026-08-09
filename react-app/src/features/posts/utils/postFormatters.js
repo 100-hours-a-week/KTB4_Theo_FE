@@ -1,6 +1,20 @@
 export const POST_TITLE_MAX_LENGTH = 26
 export const COUNT_COMPACT_THRESHOLD = 1000
 
+function parseDate(value) {
+  if (!value) {
+    return null
+  }
+
+  const date = new Date(value)
+
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+function padDatePart(value) {
+  return String(value).padStart(2, '0')
+}
+
 export function formatPostCount(count) {
   const safeCount = Number(count) || 0
 
@@ -12,21 +26,38 @@ export function formatPostCount(count) {
 }
 
 export function formatPostDate(createdAt) {
-  if (!createdAt) {
+  const date = parseDate(createdAt)
+
+  if (!date) {
     return ''
   }
 
-  return createdAt.replace('T', ' ').split('.')[0]
+  const datePart = [
+    date.getFullYear(),
+    padDatePart(date.getMonth() + 1),
+    padDatePart(date.getDate()),
+  ].join('-')
+  const timePart = [
+    padDatePart(date.getHours()),
+    padDatePart(date.getMinutes()),
+    padDatePart(date.getSeconds()),
+  ].join(':')
+
+  return `${datePart} ${timePart}`
 }
 
 export function formatPostListDate(createdAt) {
-  const formattedDate = formatPostDate(createdAt)
+  const date = parseDate(createdAt)
 
-  if (!formattedDate) {
+  if (!date) {
     return ''
   }
 
-  return formattedDate.split(' ')[0].replaceAll('-', '.')
+  return [
+    date.getFullYear(),
+    padDatePart(date.getMonth() + 1),
+    padDatePart(date.getDate()),
+  ].join('.')
 }
 
 export function getPostTitle(post) {
